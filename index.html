@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JustDoList - Version finale IHM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--surface:#181c27;--s2:#1f2436;--border:#2a2f45;
+  --text:#e2e8f0;--muted:#64748b;--accent:#6366f1;--a2:#818cf8;
+  --gold:#f59e0b;--green:#10b981;--red:#ef4444;--r:12px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;--surface:#fff;--s2:#f8fafc;--border:#e2e8f0;
+  --text:#0f172a;--muted:#94a3b8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:17px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── inputs ── */
+input,select,textarea{
+  font-family:var(--font);width:100%;padding:13px 16px;
+  background:var(--s2);border:1px solid var(--border);color:var(--text);
+  border-radius:9px;font-size:1rem;outline:none;transition:border .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+label{font-size:.82rem;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── buttons ── */
+button{font-family:var(--font);cursor:pointer;border:none;transition:.15s}
+.btn{padding:12px 24px;border-radius:9px;font-size:1rem;font-weight:600}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--a2);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:8px 16px;font-size:.88rem}
+.btn-icon{background:transparent;color:var(--muted);padding:7px;border-radius:7px;border:1px solid var(--border);line-height:1;font-size:.9rem}
+.btn-icon:hover{color:var(--text);border-color:var(--muted)}
+
+/* ════════════ AUTH ════════════ */
+#auth-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% -20%,#1e2340 0%,var(--bg) 65%);
+  padding:24px;
+}
+.auth-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:48px 44px;width:460px;max-width:100%;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+}
+.auth-logo{font-size:2.4rem;font-weight:700;letter-spacing:-.05em;text-align:center;margin-bottom:6px}
+.auth-logo span{color:var(--accent)}
+.auth-tagline{color:var(--muted);font-size:1rem;text-align:center;margin-bottom:28px}
+
+/* tabs */
+.auth-tabs{display:flex;gap:0;margin-bottom:28px;background:var(--s2);border-radius:10px;padding:4px}
+.auth-tab{flex:1;padding:10px;border-radius:7px;font-size:.95rem;font-weight:600;color:var(--muted);background:transparent;border:none;cursor:pointer;transition:.15s}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+
+.auth-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#fca5a5;border-radius:8px;padding:11px 16px;font-size:.92rem;margin-bottom:16px}
+.auth-ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.35);color:#6ee7b7;border-radius:8px;padding:11px 16px;font-size:.92rem;margin-bottom:16px}
+
+.field{margin-bottom:16px}
+.field label{margin-bottom:7px}
+
+/* ════════════ LANDING GROUPES ════════════ */
+#landing{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% -20%,#1e2340 0%,var(--bg) 65%);padding:40px 24px;
+}
+.land-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:960px;margin-bottom:40px}
+.land-logo{font-size:1.7rem;font-weight:700;letter-spacing:-.03em}
+.land-logo span{color:var(--accent)}
+.land-user-info{display:flex;align-items:center;gap:12px}
+.land-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#fff}
+.land-uname{font-size:.95rem;font-weight:500}
+.land-title{font-size:1.9rem;font-weight:700;text-align:center;margin-bottom:8px}
+.land-sub{color:var(--muted);font-size:1rem;text-align:center;margin-bottom:40px}
+.groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;max-width:960px;width:100%}
+.gcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.gcard::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--cc,var(--accent))}
+.gcard:hover{transform:translateY(-4px);border-color:var(--cc,var(--accent));box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.gc-icon{font-size:2.2rem;margin-bottom:12px}
+.gc-name{font-weight:700;font-size:1.1rem;margin-bottom:5px}
+.gc-desc{color:var(--muted);font-size:.9rem;line-height:1.5;margin-bottom:14px}
+.gc-foot{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--muted)}
+.mdots{display:flex}
+.mdot{width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;margin-left:-8px}
+.mdot:first-child{margin-left:0}
+.new-gcard{border:2px dashed var(--border);min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);transition:.2s;cursor:pointer;border-radius:var(--r)}
+.new-gcard:hover{border-color:var(--accent);color:var(--accent);background:rgba(99,102,241,.04)}
+.new-plus{font-size:2.8rem;font-weight:200;line-height:1}
+
+/* ════════════ APP ════════════ */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:14px;height:64px;position:sticky;top:0;z-index:100}
+.hdr-brand{font-weight:700;font-size:1.15rem;letter-spacing:-.02em;white-space:nowrap}
+.hdr-brand span{color:var(--accent)}
+.hdr-badge{background:var(--accent);color:#fff;padding:4px 14px;border-radius:20px;font-size:.82rem;font-weight:600;white-space:nowrap}
+.hdr-nav{display:flex;gap:2px;flex:1;overflow-x:auto;padding:0 8px}
+.hdr-nav::-webkit-scrollbar{height:0}
+.nav-btn{padding:8px 18px;background:transparent;color:var(--muted);font-size:.92rem;font-weight:500;border-radius:22px;border:1px solid transparent;white-space:nowrap}
+.nav-btn.active{background:rgba(99,102,241,.15);color:var(--accent);border-color:rgba(99,102,241,.3)}
+.nav-btn:hover:not(.active){color:var(--text)}
+.hdr-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+.hdr-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#fff}
+.hdr-name{font-size:.95rem;font-weight:500}
+
+/* layout */
+.app-body{display:grid;grid-template-columns:305px 1fr;gap:20px;padding:20px;max-width:1800px;margin:0 auto}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px}
+.ptitle{font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:18px;display:flex;align-items:center;gap:7px}
+.prow{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.prow .ptitle{margin:0}
+.empty{color:var(--muted);font-size:.92rem;text-align:center;padding:28px;font-style:italic}
+
+/* équipe */
+.tmember{display:flex;align-items:center;gap:13px;padding:11px;border-radius:9px;transition:.15s}
+.tmember:hover{background:var(--s2)}
+.mav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0}
+.mname{font-size:1rem;font-weight:500}
+.mrole{font-size:.82rem;color:var(--muted)}
+.sdot{width:10px;height:10px;border-radius:50%;background:var(--green);margin-left:auto;flex-shrink:0}
+
+/* coach */
+.coach-box{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.3);border-radius:9px;padding:15px;font-size:.98rem;line-height:1.65}
+
+/* todo */
+.todo-item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);font-size:.95rem}
+.todo-item:last-child{border-bottom:none}
+.todo-item input[type=checkbox]{width:auto;accent-color:var(--accent);cursor:pointer;width:18px;height:18px}
+.todo-item.done span{text-decoration:line-through;color:var(--muted)}
+
+/* taskboard */
+.taskboard{display:flex;gap:16px;overflow-x:auto;padding-bottom:6px}
+.tb-col{flex:0 0 240px;background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:15px;min-height:190px}
+.tb-col-h{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.tc{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:13px;margin-bottom:10px;font-size:.93rem;cursor:grab;border-left:4px solid var(--tc,#555);transition:.15s}
+.tc:hover{box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.tc:active{cursor:grabbing;opacity:.7}
+.tc-auth{font-size:.78rem;color:var(--muted);margin-top:6px}
+
+/* planning */
+.cal-wrap{display:grid;grid-template-columns:52px repeat(7,1fr);background:var(--border);gap:1px;border:1px solid var(--border);border-radius:9px;overflow:hidden;font-size:.82rem}
+.cal-hdr{background:var(--s2);color:var(--accent);font-weight:700;display:flex;align-items:center;justify-content:center;padding:10px 4px;letter-spacing:.05em}
+.cal-time{background:var(--s2);color:var(--muted);display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px 0 0;font-size:.8rem}
+.cal-cell{background:var(--surface);position:relative;min-height:62px;cursor:pointer}
+.cal-cell:hover{background:rgba(99,102,241,.07)}
+.ev-block{position:absolute;left:2px;right:2px;border-radius:5px;padding:5px 8px;font-size:.76rem;color:#fff;z-index:10;cursor:grab;overflow:hidden;border-left:2px solid rgba(255,255,255,.4)}
+.ev-block:hover{filter:brightness(1.12)}
+.btn-view{padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-size:.9rem;font-weight:500}
+.btn-view.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* idées */
+.tabs{display:flex;gap:5px;margin-bottom:16px}
+.tab-btn{flex:1;padding:10px;background:var(--s2);border:1px solid var(--border);color:var(--muted);font-size:.88rem;font-weight:600;border-radius:7px;cursor:pointer}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.idea-item{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:15px;margin-bottom:11px}
+.idea-auth{font-size:.82rem;font-weight:600;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.idea-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.idea-text{font-size:.95rem;line-height:1.55;margin-bottom:9px}
+.comment-item{font-size:.84rem;color:var(--muted);padding:6px 0;border-top:1px solid var(--border)}
+.comment-item strong{color:var(--text)}
+.idea-list{max-height:320px;overflow-y:auto}
+.add-row{display:flex;gap:9px;margin-bottom:14px}
+.add-row input{margin:0}
+
+/* historique */
+.h-feed{max-height:520px;overflow-y:auto}
+.h-item{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--border)}
+.h-item:last-child{border-bottom:none}
+.h-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff}
+.h-body{flex:1}
+.h-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:.92rem}
+.h-name{font-weight:600}
+.h-tag{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.74rem;font-weight:700;background:rgba(99,102,241,.15);color:var(--a2)}
+.h-tag.g{background:rgba(16,185,129,.15);color:#10b981}
+.h-tag.o{background:rgba(245,158,11,.15);color:#f59e0b}
+.h-tag.r{background:rgba(239,68,68,.15);color:#ef4444}
+.h-time{font-size:.77rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+.h-detail{font-size:.87rem;color:var(--muted);margin-top:3px}
+
+/* ════════════ MESSAGERIE ════════════ */
+#msg-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;
+  display:flex;align-items:flex-end;justify-content:flex-end;padding:24px;
+  backdrop-filter:blur(4px);
+}
+.msg-win{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  width:360px;max-width:95vw;max-height:560px;display:flex;flex-direction:column;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);overflow:hidden}
+.msg-hdr{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--border);background:var(--s2);flex-shrink:0}
+.msg-hdr-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.84rem;font-weight:700;color:#fff;flex-shrink:0}
+.msg-hdr-name{font-weight:600;font-size:1rem;flex:1}
+.msg-hdr-close{background:none;color:var(--muted);font-size:1.1rem;border:none;cursor:pointer;padding:5px;border-radius:6px}
+.msg-hdr-close:hover{color:var(--text);background:var(--border)}
+.msg-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;min-height:0}
+.bubble{max-width:82%;padding:10px 14px;border-radius:13px;font-size:.9rem;line-height:1.45;word-break:break-word}
+.bubble.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.bubble.them{background:var(--s2);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--border)}
+.bubble-name{font-size:.72rem;font-weight:600;margin-bottom:4px;opacity:.75}
+.msg-empty{color:var(--muted);font-size:.88rem;text-align:center;padding:34px 0;font-style:italic}
+.msg-foot{padding:13px 15px;border-top:1px solid var(--border);display:flex;gap:9px;flex-shrink:0}
+.msg-foot input{margin:0;font-size:.93rem;border-radius:22px;padding:10px 16px}
+.msg-send-btn{background:var(--accent);color:#fff;border:none;border-radius:22px;padding:10px 18px;font-size:.88rem;font-weight:600;flex-shrink:0}
+.msg-send-btn:hover{background:var(--a2)}
+
+/* ════════════ MODALES ════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);padding:20px}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:480px;max-width:100%;max-height:92vh;overflow-y:auto}
+.modal h3{font-weight:700;font-size:1.1rem;margin-bottom:22px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.color-row{display:flex;gap:11px;flex-wrap:wrap;margin-top:7px}
+.cswatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s}
+.cswatch.sel{border-color:#fff;transform:scale(1.18)}
+#icon-picker span{font-size:1.5rem;cursor:pointer;padding:6px;border-radius:6px;border:2px solid transparent;transition:.1s;display:inline-block}
+#icon-picker span:hover,#icon-picker span.sel{border-color:var(--accent);background:rgba(99,102,241,.1)}
+
+.legend-help{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:.86rem;background:var(--s2);border:1px solid var(--border);padding:10px 12px;border-radius:9px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(99,102,241,.45);outline-offset:2px}
+.coach-box.alert{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.6);color:var(--text)}
+/* ════════════ TOAST ════════════ */
+#toasts{position:fixed;bottom:26px;right:26px;z-index:9999;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);padding:13px 20px;border-radius:9px;font-size:.93rem;animation:tIn .2s ease;max-width:340px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.toast.g{border-left-color:var(--green)}
+.toast.r{border-left-color:var(--red)}
+.toast.o{border-left-color:var(--gold)}
+@keyframes tIn{from{transform:translateX(22px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* modal créer groupe */
+.invite-box{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-top:14px;font-size:.88rem;color:var(--muted);line-height:1.6}
+.invite-code{font-family:var(--mono);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:.9rem;color:var(--accent);letter-spacing:.1em;display:inline-block;margin-top:6px;cursor:pointer}
+</style>
+</head>
+<body data-theme="dark">
+<div id="toasts"></div>
+
+<!-- ════════════════ AUTH ════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">Just<span>Do</span>List</div>
+    <div class="auth-tagline">Gérez vos projets collaboratifs</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"   onclick="switchAuthTab('login')">Se connecter</button>
+      <button class="auth-tab"        id="tab-signup"  onclick="switchAuthTab('signup')">S'inscrire</button>
+    </div>
+
+    <div id="auth-msg" class="hidden"></div>
+
+    <!-- CONNEXION -->
+    <div id="pane-login">
+      <div class="field"><label>Identifiant</label>
+        <input type="text" id="l-user" placeholder="Votre identifiant" autocomplete="username"
+               onkeydown="if(event.key==='Enter')$('l-pass').focus()">
+      </div>
+      <div class="field"><label>Mot de passe</label>
+        <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:6px;padding:14px;font-size:1.05rem" onclick="doLogin()">
+        Se connecter →
+      </button>
+      <p style="text-align:center;margin-top:16px;font-size:.88rem;color:var(--muted)">
+        Pas encore de compte ?
+        <span style="color:var(--accent);cursor:pointer;font-weight:600" onclick="switchAuthTab('signup')">S'inscrire</span>
+      </p>
+    </div>
+
+    <!-- INSCRIPTION -->
+    <div id="pane-signup" class="hidden">
+      <div class="field"><label>Prénom / Pseudo</label>
+        <input type="text" id="s-name" placeholder="Ex: Marie">
+      </div>
+      <div class="field"><label>Identifiant (unique)</label>
+        <input type="text" id="s-user" placeholder="Ex: marie2024" autocomplete="username">
+      </div>
+      <div class="field"><label>Mot de passe</label>
+        <input type="password" id="s-pass" placeholder="6 caractères minimum" autocomplete="new-password">
+      </div>
+      <div class="field"><label>Rôle dans votre groupe</label>
+        <input type="text" id="s-role" placeholder="Ex: Réalisatrice, Développeur...">
+      </div>
+      <div class="field"><label>Code d'invitation groupe <span style="font-weight:400;text-transform:none;letter-spacing:0">(optionnel)</span></label>
+        <input type="text" id="s-code" placeholder="Ex: CINESENS" style="font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase">
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:6px;padding:14px;font-size:1.05rem" onclick="doSignup()">
+        Créer mon compte →
+      </button>
+      <p style="text-align:center;margin-top:16px;font-size:.88rem;color:var(--muted)">
+        Déjà inscrit ?
+        <span style="color:var(--accent);cursor:pointer;font-weight:600" onclick="switchAuthTab('login')">Se connecter</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ LANDING (mes groupes) ════════════════ -->
+<div id="landing" class="hidden">
+  <div class="land-bar">
+    <div class="land-logo">Just<span>Do</span>List</div>
+    <div class="land-user-info">
+      <div class="land-av" id="land-av"></div>
+      <span id="land-uname" style="font-size:1rem;font-weight:500"></span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+  <div class="land-title">Mes groupes</div>
+  <div class="land-sub">Sélectionnez un groupe pour commencer</div>
+  <div class="groups-grid" id="groups-grid"></div>
+</div>
+
+<!-- ════════════════ APP ════════════════ -->
+<div id="app" class="hidden">
+  <header>
+    <div class="hdr-brand">Just<span>Do</span>List</div>
+    <span class="hdr-badge" id="hdr-group"></span>
+    <nav class="hdr-nav">
+      <button class="nav-btn active" onclick="showView('planning')">📅 Planning</button>
+      <button class="nav-btn" onclick="showView('tasks')">✅ Tâches</button>
+      <button class="nav-btn" onclick="showView('ideas')">💡 Idées</button>
+      <button class="nav-btn" onclick="showView('history')">🕐 Historique</button>
+    </nav>
+    <div class="hdr-right">
+      <button onclick="toggleTheme()" class="btn-icon" title="Thème">☀️/🌙</button>
+      <button class="btn-icon notif-btn" id="notif-btn" onclick="toggleNotifPanel()" title="Notifications" style="position:relative">
+        🔔
+        <span id="notif-badge" class="hidden" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface)"></span>
+      </button>
+      <div class="hdr-av" id="hdr-av"></div>
+      <span class="hdr-name" id="hdr-name"></span>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">🏠 Mes groupes</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- PANNEAU NOTIFICATIONS -->
+  <div id="notif-panel" class="hidden" style="position:fixed;top:70px;right:20px;width:320px;max-height:420px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 50px rgba(0,0,0,.45);z-index:500;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--s2)">
+      <span style="font-weight:700;font-size:.95rem">🔔 Notifications</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="notif-count" style="font-size:.78rem;color:var(--muted)"></span>
+        <button onclick="clearNotifs()" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid var(--border)">Tout effacer</button>
+        <button onclick="toggleNotifPanel()" style="background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="notif-list" style="overflow-y:auto;flex:1;padding:8px 0"></div>
+  </div>
+
+  <div class="app-body">
+    <aside>
+      <div class="panel">
+        <div class="ptitle">👥 Équipe</div>
+        <div id="team-list"></div>
+      </div>
+      <div class="panel">
+        <div class="ptitle">🤖 Coach Assistant</div>
+        <div class="coach-box" id="coach-text"></div>
+      </div>
+      <div class="panel">
+        <div class="ptitle">📝 To-Do Rapide</div>
+        <div style="display:flex;gap:9px;margin-bottom:14px">
+          <input type="text" id="todo-input" placeholder="Nouvelle tâche..."
+                 onkeydown="if(event.key==='Enter')addTodo()">
+          <button class="btn btn-primary btn-sm" onclick="addTodo()">+</button>
+        </div>
+        <div id="todo-list"></div>
+      </div>
+    </aside>
+
+    <main>
+      <div id="view-planning">
+        <div class="panel">
+          <div class="prow">
+            <span class="ptitle">📅 Semainier</span>
+            <div style="display:flex;gap:9px;align-items:center">
+              <div style="display:flex;gap:5px">
+                <button id="bv-all" class="btn-view active" onclick="setPView('all')">🌍 Équipe</button>
+                <button id="bv-me"  class="btn-view"        onclick="setPView('me')">👤 Moi</button>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openEvModal()">+ Ajouter un créneau</button>
+            </div>
+          </div>
+          <div class="cal-wrap" id="cal-grid"></div>
+          <div class="legend-help" aria-label="Légende du planning">
+            <span>🎨 Couleur = membre</span><span>🔒 Privé</span><span>👁 Partagé</span><span>▧ Hachures = indisponibilité</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-tasks" class="hidden">
+        <div class="panel">
+          <div class="prow">
+            <span class="ptitle">✅ Tableau de tâches</span>
+            <div style="display:flex;align-items:center;gap:14px">
+              <span style="font-size:.84rem;color:var(--muted)">🔒 Privé &nbsp;👁 Partagé</span>
+              <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Ajouter</button>
+            </div>
+          </div>
+          <div class="taskboard" id="taskboard"></div>
+        </div>
+      </div>
+
+      <div id="view-ideas" class="hidden">
+        <div class="panel">
+          <div class="ptitle">💡 Boîte à Idées</div>
+          <div class="tabs">
+            <button class="tab-btn active" id="tab-g" onclick="switchIdea('groupe')">🌍 Groupe</button>
+            <button class="tab-btn"        id="tab-p" onclick="switchIdea('perso')">🔒 Perso</button>
+          </div>
+          <div id="pane-groupe">
+            <div class="add-row">
+              <input type="text" id="inp-groupe" placeholder="Suggérer une idée au groupe...">
+              <button class="btn btn-primary btn-sm" onclick="addIdea('groupe')">Partager</button>
+            </div>
+            <div class="idea-list" id="list-groupe"></div>
+          </div>
+          <div id="pane-perso" class="hidden">
+            <div class="add-row">
+              <input type="text" id="inp-perso" placeholder="Note privée...">
+              <button class="btn btn-sm" style="background:var(--s2);border:1px solid var(--border);color:var(--text);white-space:nowrap" onclick="addIdea('perso')">🔒 Enregistrer</button>
+            </div>
+            <div class="idea-list" id="list-perso"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-history" class="hidden">
+        <div class="panel">
+          <div class="prow">
+            <span class="ptitle">🕐 Historique d'activité</span>
+            <select id="hist-filter" style="width:auto;margin:0;font-size:.9rem;padding:8px 12px" onchange="renderHistory()">
+              <option value="all">Toute l'équipe</option>
+            </select>
+          </div>
+          <div class="h-feed" id="h-feed"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- MESSAGERIE -->
+<div id="msg-overlay" class="hidden" onclick="closeMsgOutside(event)">
+  <div class="msg-win">
+    <div class="msg-hdr">
+      <div class="msg-hdr-av" id="msg-hdr-av"></div>
+      <span class="msg-hdr-name" id="msg-hdr-name"></span>
+      <button class="msg-hdr-close" onclick="closeMsg()">✕</button>
+    </div>
+    <div class="msg-body" id="msg-body"></div>
+    <div class="msg-foot">
+      <input type="text" id="msg-input" placeholder="Écrire un message..."
+             onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="msg-send-btn" onclick="sendMsg()">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ÉVÉNEMENT -->
+<div id="modal-ev" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 id="mev-title">Ajouter un créneau au planning</h3>
+    <div class="field"><label>Titre du créneau</label>
+      <input type="text" id="fev-title" placeholder="Ex: Réunion de production" aria-label="Titre du créneau">
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Jour</label>
+        <select id="fev-day">
+          <option value="1">Lundi</option><option value="2">Mardi</option>
+          <option value="3" selected>Mercredi</option><option value="4">Jeudi</option>
+          <option value="5">Vendredi</option><option value="6">Samedi</option><option value="7">Dimanche</option>
+        </select>
+      </div>
+      <div class="field"><label>Heure de début (8–18)</label>
+        <input type="number" id="fev-hour" min="8" max="18" value="10">
+      </div>
+    </div>
+    <div class="field"><label>Durée (heures)</label>
+      <input type="number" id="fev-dur" min="0.5" step="0.5" value="1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModals()">Annuler</button>
+      <button id="btn-del-ev" class="btn btn-danger hidden" onclick="deleteEvent()">Supprimer</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Enregistrer le créneau</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TÂCHE -->
+<div id="modal-task" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>Ajouter une tâche</h3>
+    <div class="field"><label>Titre</label>
+      <input type="text" id="ftask-title" placeholder="Ex: Préparer le script">
+    </div>
+    <div class="field"><label>Colonne</label>
+      <select id="ftask-col"></select>
+    </div>
+    <div class="field"><label>Visibilité</label>
+      <select id="ftask-vis">
+        <option value="shared">👁 Partagée avec l'équipe</option>
+        <option value="private">🔒 Privée (moi seulement)</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModals()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveTask()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CRÉER GROUPE -->
+<div id="modal-group" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>Créer un nouveau groupe</h3>
+    <div class="field"><label>Nom du groupe</label>
+      <input type="text" id="fg-name" placeholder="Ex: Studio Podcast, Club Photo...">
+    </div>
+    <div class="field"><label>Description</label>
+      <input type="text" id="fg-desc" placeholder="Ex: Production d'un podcast mensuel">
+    </div>
+    <div class="field"><label>Icône</label>
+      <div id="icon-picker" style="margin-top:7px;display:flex;flex-wrap:wrap;gap:5px">
+        <span onclick="pickIcon(this)" data-i="🎬">🎬</span><span onclick="pickIcon(this)" data-i="🎵">🎵</span>
+        <span onclick="pickIcon(this)" data-i="📸">📸</span><span onclick="pickIcon(this)" data-i="🎨">🎨</span>
+        <span onclick="pickIcon(this)" data-i="🎭">🎭</span><span onclick="pickIcon(this)" data-i="🏋️">🏋️</span>
+        <span onclick="pickIcon(this)" data-i="📚">📚</span><span onclick="pickIcon(this)" data-i="🌱">🌱</span>
+        <span onclick="pickIcon(this)" data-i="💻">💻</span><span onclick="pickIcon(this)" data-i="🎓">🎓</span>
+        <span onclick="pickIcon(this)" data-i="🎮">🎮</span><span onclick="pickIcon(this)" data-i="⚽">⚽</span>
+      </div>
+    </div>
+    <div class="field"><label>Couleur</label>
+      <div class="color-row" id="color-picker">
+        <div class="cswatch sel" style="background:#6366f1" data-c="#6366f1" onclick="pickColor(this)"></div>
+        <div class="cswatch" style="background:#e50914" data-c="#e50914" onclick="pickColor(this)"></div>
+        <div class="cswatch" style="background:#10b981" data-c="#10b981" onclick="pickColor(this)"></div>
+        <div class="cswatch" style="background:#f59e0b" data-c="#f59e0b" onclick="pickColor(this)"></div>
+        <div class="cswatch" style="background:#8b5cf6" data-c="#8b5cf6" onclick="pickColor(this)"></div>
+        <div class="cswatch" style="background:#ec4899" data-c="#ec4899" onclick="pickColor(this)"></div>
+        <div class="cswatch" style="background:#06b6d4" data-c="#06b6d4" onclick="pickColor(this)"></div>
+      </div>
+    </div>
+    <div id="invite-result" class="hidden invite-box">
+      Groupe créé ! Code d'invitation à partager :<br>
+      <span class="invite-code" id="invite-code" onclick="copyCode()" title="Cliquer pour copier"></span>
+      <br><span style="font-size:.82rem">Cliquez sur le code pour le copier.</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModals()">Fermer</button>
+      <button id="fg-btn" class="btn btn-primary" onclick="createGroup()">Créer le groupe</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  DONNÉES INITIALES
+// ════════════════════════════════════════
+const COLORS=['#e50914','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#f97316','#84cc16'];
+const DAYS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const COLS=[{id:'todo',label:'À faire'},{id:'doing',label:'En cours'},{id:'done',label:'Validé ✓'}];
+
+// Base de comptes (simulée en mémoire)
+// Chaque account : { pw, name, role, color, groupIds: [] }
+let accounts = {
+  marie:  {pw:'marie123', name:'Marie',  role:'Réalisatrice', color:'#e50914', groupIds:['cine-sens']},
+  john:   {pw:'john123',  name:'John',   role:'Trésorier',    color:'#3b82f6', groupIds:['cine-sens']},
+  elliot: {pw:'elliot123',name:'Elliot', role:'Technique',    color:'#10b981', groupIds:['cine-sens']},
+};
+
+let groups = [{
+  id:'cine-sens', name:'Ciné-Sens', desc:'Adapter des films pour personnes malvoyantes',
+  icon:'🎬', color:'#e50914', inviteCode:'CINESENS',
+  members:['marie','john','elliot'],
+  events:[
+    {id:1,title:'Tournage Scène 1',user:'marie', day:1,hour:14,dur:3},
+    {id:2,title:'Tests Micros',    user:'elliot',day:2,hour:9, dur:2},
+    {id:3,title:'Point Budget',    user:'john',  day:4,hour:11,dur:1},
+    {id:4,title:'Indisponibilité', user:'john',  day:3,hour:14,dur:2,indispo:true},
+  ],
+  tasks:[
+    {id:1,title:'Script Scène 3',     user:'marie', col:'todo', vis:'shared'},
+    {id:2,title:'Casting figuration', user:'marie', col:'doing',vis:'shared'},
+    {id:3,title:'Validation Scène 2', user:'marie', col:'doing',vis:'shared'},
+    {id:4,title:'Facture Studio',     user:'john',  col:'todo', vis:'shared'},
+    {id:5,title:'Achat Câbles',       user:'john',  col:'done', vis:'shared'},
+    {id:6,title:'Setup Micros',       user:'elliot',col:'todo', vis:'shared'},
+    {id:7,title:'Calibration Son',    user:'elliot',col:'doing',vis:'shared'},
+    {id:8,title:'Notes perso budget', user:'john',  col:'todo', vis:'private'},
+  ],
+  ideas:[
+    {id:1,author:'elliot',text:'Et si on utilisait du son binaural pour la scène 2 ?',
+     comments:[{author:'marie',text:'Excellente idée, à tester !'}]}
+  ],
+  messages:{},
+  history:[
+    {id:1,user:'elliot',action:'a partagé une idée',detail:'Son binaural pour scène 2',tag:'idea',label:'Idée',ts:Date.now()-7200000},
+    {id:2,user:'marie', action:'a créé un créneau', detail:'Tournage Scène 1 – Lundi 14h',tag:'event',label:'Planning',ts:Date.now()-18000000},
+    {id:3,user:'john',  action:'a validé une tâche',detail:'Achat Câbles → Validé',tag:'task',label:'Tâche',ts:Date.now()-28800000},
+  ],
+  perNotes:{}, // perNotes[userId] = []
+  perTodos:{}, // perTodos[userId] = []
+}];
+
+// Pré-remplir perNotes/perTodos depuis l'ancien format
+groups[0].perNotes = {
+  marie:['Vérifier le micro d\'Elliot.'],
+  john:['Décaler séance orthophoniste.'],
+  elliot:['Acheter des piles.'],
+};
+groups[0].perTodos = {
+  marie:['Répondre mail producteur','Valider script scène 3'],
+  john:['Faire le virement','Envoyer facture studio'],
+  elliot:['Mettre à jour logiciel son','Commander piles'],
+};
+
+const COACH_MSGS = {
+  marie:'🎥 Bonjour Marie ! 2 scènes à valider aujourd\'hui. Conflit détecté mercredi 14h.',
+  john:'💰 Salut John ! Elliot attend la validation du matériel avant vendredi.',
+  elliot:'⚙️ Hello Elliot ! Prépare la salle en attendant le feu vert de John.',
+};
+
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+let authId    = null;
+let activeGrp = null;
+let editEvId  = null;
+let planView  = 'all';
+let msgTarget = null;
+let lastLoginTs = {}; // lastLoginTs[userId] = timestamp
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+const $    = id => document.getElementById(id);
+const q    = s  => document.querySelectorAll(s);
+const show = id => $(id).classList.remove('hidden');
+const hide = id => $(id).classList.add('hidden');
+
+function screen(name){
+  ['auth-screen','landing','app'].forEach(id=>{
+    $(id).classList.toggle('hidden', id!==name);
+  });
+}
+
+function toast(msg,type=''){
+  const c=$('toasts'),t=document.createElement('div');
+  t.className='toast '+(type||'');t.textContent=msg;
+  c.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+function ago(ts){
+  const d=Date.now()-ts,m=Math.floor(d/60000),h=Math.floor(m/60),dy=Math.floor(h/24);
+  return dy>0?`il y a ${dy}j`:h>0?`il y a ${h}h`:m>0?`il y a ${m}min`:"à l'instant";
+}
+
+function acct(uid=authId){ return accounts[uid]; }
+function grpMemberName(uid){ return acct(uid)?.name || uid; }
+function grpMemberColor(uid){ return acct(uid)?.color || '#6366f1'; }
+
+// ════════════════════════════════════════
+//  AUTH — onglets
+// ════════════════════════════════════════
+function switchAuthTab(tab){
+  $('tab-login').classList.toggle('active',tab==='login');
+  $('tab-signup').classList.toggle('active',tab==='signup');
+  $('pane-login').classList.toggle('hidden',tab!=='login');
+  $('pane-signup').classList.toggle('hidden',tab!=='signup');
+  hide('auth-msg');
+}
+
+function setAuthMsg(msg,ok=false){
+  const el=$('auth-msg');
+  el.className = ok ? 'auth-ok' : 'auth-err';
+  el.textContent = msg;
+  show('auth-msg');
+}
+
+// ── CONNEXION ──
+function doLogin(){
+  const u=$('l-user').value.trim().toLowerCase();
+  const p=$('l-pass').value;
+  hide('auth-msg');
+  if(!u||!p){ setAuthMsg('Veuillez remplir tous les champs.'); return; }
+  const a=accounts[u];
+  if(!a||a.pw!==p){ setAuthMsg('Identifiant ou mot de passe incorrect.'); $('l-pass').value=''; return; }
+  authId=u;
+  afterLogin();
+}
+
+// ── INSCRIPTION ──
+function doSignup(){
+  const name  = $('s-name').value.trim();
+  const user  = $('s-user').value.trim().toLowerCase().replace(/\s+/g,'');
+  const pw    = $('s-pass').value;
+  const role  = $('s-role').value.trim() || 'Membre';
+  const code  = $('s-code').value.trim().toUpperCase();
+  hide('auth-msg');
+
+  if(!name||!user||!pw){ setAuthMsg('Prénom, identifiant et mot de passe sont obligatoires.'); return; }
+  if(pw.length<6){ setAuthMsg('Le mot de passe doit contenir au moins 6 caractères.'); return; }
+  if(accounts[user]){ setAuthMsg('Cet identifiant est déjà pris, choisissez-en un autre.'); return; }
+
+  // Couleur aléatoire parmi celles non déjà utilisées
+  const usedColors = Object.values(accounts).map(a=>a.color);
+  const freeColors = COLORS.filter(c=>!usedColors.includes(c));
+  const color = freeColors[0] || COLORS[Math.floor(Math.random()*COLORS.length)];
+
+  // Créer le compte
+  accounts[user] = {pw, name, role, color, groupIds:[]};
+
+  // Rejoindre un groupe via code d'invitation
+  if(code){
+    const grp=groups.find(g=>g.inviteCode===code);
+    if(grp){
+      if(!grp.members.includes(user)) grp.members.push(user);
+      accounts[user].groupIds.push(grp.id);
+      setAuthMsg(`Compte créé et rejoint le groupe "${grp.name}" ! Connectez-vous.`, true);
+    } else {
+      setAuthMsg(`Compte créé, mais le code "${code}" ne correspond à aucun groupe. Connectez-vous et rejoignez un groupe plus tard.`, true);
+    }
+  } else {
+    setAuthMsg('Compte créé avec succès ! Connectez-vous.', true);
+  }
+
+  // Pré-remplir les données perso dans les groupes rejoints
+  accounts[user].groupIds.forEach(gid=>{
+    const g=groups.find(x=>x.id===gid);
+    if(g){ if(!g.perNotes[user]) g.perNotes[user]=[]; if(!g.perTodos[user]) g.perTodos[user]=[]; }
+  });
+
+  // Basculer vers connexion
+  setTimeout(()=>{ switchAuthTab('login'); $('l-user').value=user; $('l-pass').focus(); }, 1200);
+}
+
+// ── APRÈS LOGIN ──
+function afterLogin(){
+  const a=acct();
+  // Nettoyer les champs
+  $('l-user').value=''; $('l-pass').value=''; hide('auth-msg');
+
+  const myGroups = groups.filter(g=>g.members.includes(authId));
+
+  if(myGroups.length===0){
+    // Pas encore dans un groupe → landing avec juste le bouton créer
+    showLanding();
+  } else if(myGroups.length===1){
+    // Un seul groupe → accès direct
+    enterGroup(myGroups[0]);
+  } else {
+    // Plusieurs groupes → landing pour choisir
+    showLanding();
+  }
+}
+
+// ════════════════════════════════════════
+//  LANDING
+// ════════════════════════════════════════
+function showLanding(){
+  screen('landing');
+  const a=acct();
+  const av=$('land-av');
+  av.textContent=a.name[0];
+  av.style.background=a.color;
+  $('land-uname').textContent=a.name;
+  renderGroupGrid();
+}
+
+function renderGroupGrid(){
+  const myGroups=groups.filter(g=>g.members.includes(authId));
+  const grid=$('groups-grid');
+  grid.innerHTML=myGroups.map(g=>{
+    const dots=g.members.slice(0,4).map((uid,i)=>{
+      const c=grpMemberColor(uid);
+      return `<div class="mdot" style="background:${c};z-index:${10-i}">${(acct(uid)?.name||uid)[0]}</div>`;
+    }).join('');
+    return `<div class="gcard" style="--cc:${g.color}" onclick="enterGroup(groups.find(x=>x.id==='${g.id}'))">
+      <div class="gc-icon">${g.icon}</div>
+      <div class="gc-name">${g.name}</div>
+      <div class="gc-desc">${g.desc}</div>
+      <div class="gc-foot"><div class="mdots">${dots}</div>${g.members.length} membre${g.members.length>1?'s':''}</div>
+    </div>`;
+  }).join('');
+  grid.innerHTML+=`<div class="gcard new-gcard" onclick="openGroupModal()">
+    <div class="new-plus">+</div>
+    <div style="font-size:.95rem;font-weight:600">Nouveau groupe</div>
+    <div style="font-size:.82rem;color:var(--muted)">Créer ou rejoindre</div>
+  </div>`;
+}
+
+function goHome(){
+  closeMsg();
+  hide('notif-panel');
+  showLanding();
+}
+
+// ════════════════════════════════════════
+//  ENTRER DANS UN GROUPE
+// ════════════════════════════════════════
+function enterGroup(grp){
+  activeGrp=grp;
+  if(!grp.perNotes[authId]) grp.perNotes[authId]=[];
+  if(!grp.perTodos[authId]) grp.perTodos[authId]=[];
+
+  screen('app');
+  closeMsg();
+  hide('notif-panel');
+
+  $('hdr-group').textContent=grp.name;
+  $('hdr-name').textContent=acct().name;
+  const av=$('hdr-av');
+  av.textContent=acct().name[0];
+  av.style.background=acct().color;
+  $('coach-text').textContent=COACH_MSGS[authId]||`👋 Bonjour ${acct().name} !`; $('coach-text').classList.remove('alert');
+
+  q('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  showView('planning');
+  renderTeam();
+  renderTodos();
+  renderBoard();
+  renderHistory();
+  initCalendar();
+  renderEvents();
+
+  // Notifs de connexion
+  buildLoginNotifs();
+  // Enregistrer le timestamp de cette session pour la prochaine
+  lastLoginTs[authId] = Date.now();
+}
+
+// ════════════════════════════════════════
+//  LOGOUT
+// ════════════════════════════════════════
+function logout(){
+  authId=null; activeGrp=null; msgTarget=null; editEvId=null;
+  closeMsg();
+  hide('notif-panel');
+  screen('auth-screen');
+  switchAuthTab('login');
+}
+
+// ════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════
+// Chaque notif : { id, type, msg, detail, ts, read }
+// Stockées dans un objet global par userId
+let notifStore = {}; // notifStore[userId] = []
+
+function getNotifs(uid=authId){
+  if(!notifStore[uid]) notifStore[uid]=[];
+  return notifStore[uid];
+}
+
+// Appelée à la connexion pour calculer les notifs depuis la dernière session
+function buildLoginNotifs(){
+  if(!authId||!activeGrp) return;
+  const notifs=getNotifs();
+  const lastLogin=lastLoginTs[authId]||0;
+  const newNotifs=[];
+
+  // 1. Nouveaux messages reçus depuis la dernière session
+  activeGrp.members.forEach(uid=>{
+    if(uid===authId) return;
+    const key=msgKey(authId,uid);
+    const msgs=(activeGrp.messages[key]||[]).filter(m=>m.from!==authId&&m.ts>lastLogin);
+    if(msgs.length){
+      newNotifs.push({
+        id:Date.now()+Math.random(),type:'msg',read:false,ts:Date.now(),
+        msg:`💬 ${acct(uid)?.name||uid} vous a envoyé ${msgs.length} message${msgs.length>1?'s':''}`,
+        detail:msgs[msgs.length-1].text.slice(0,50)
+      });
+    }
+  });
+
+  // 2. Nouvelles tâches partagées créées par d'autres depuis la dernière session
+  const newTasks=activeGrp.tasks.filter(t=>t.user!==authId&&t.vis==='shared'&&(t.createdTs||0)>lastLogin);
+  if(newTasks.length){
+    newNotifs.push({
+      id:Date.now()+Math.random(),type:'task',read:false,ts:Date.now(),
+      msg:`✅ ${newTasks.length} nouvelle${newTasks.length>1?'s':''} tâche${newTasks.length>1?'s':''} partagée${newTasks.length>1?'s':''}`,
+      detail:newTasks.map(t=>t.title).join(', ').slice(0,60)
+    });
+  }
+
+  // 3. Nouveaux événements créés par d'autres
+  const newEvs=activeGrp.events.filter(ev=>ev.user!==authId&&(ev.createdTs||0)>lastLogin&&!ev.indispo);
+  if(newEvs.length){
+    newNotifs.push({
+      id:Date.now()+Math.random(),type:'event',read:false,ts:Date.now(),
+      msg:`📅 ${newEvs.length} nouveau${newEvs.length>1?'x':''} créneau${newEvs.length>1?'x':''}`,
+      detail:newEvs.map(e=>e.title).join(', ').slice(0,60)
+    });
+  }
+
+  // 4. Nouvelles idées partagées
+  const newIdeas=activeGrp.ideas.filter(i=>i.author!==authId&&(i.createdTs||0)>lastLogin);
+  if(newIdeas.length){
+    newNotifs.push({
+      id:Date.now()+Math.random(),type:'idea',read:false,ts:Date.now(),
+      msg:`💡 ${newIdeas.length} nouvelle${newIdeas.length>1?'s':''} idée${newIdeas.length>1?'s':''}`,
+      detail:newIdeas.map(i=>i.text).join(', ').slice(0,60)
+    });
+  }
+
+  // Ajouter au store
+  newNotifs.forEach(n=>notifs.unshift(n));
+  updateNotifBadge();
+
+  // Afficher un toast résumé si des notifs
+  if(newNotifs.length){
+    const total=newNotifs.length;
+    toast(`🔔 ${total} nouvelle${total>1?'s':''} notification${total>1?'s':''} depuis votre dernière connexion`,'o');
+  }
+}
+
+function updateNotifBadge(){
+  const unread=getNotifs().filter(n=>!n.read).length;
+  const badge=$('notif-badge');
+  if(!badge) return;
+  if(unread>0){
+    badge.textContent=unread>9?'9+':unread;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+  $('notif-count').textContent=unread>0?`${unread} non lue${unread>1?'s':''}` :'Tout lu';
+}
+
+function toggleNotifPanel(){
+  const panel=$('notif-panel');
+  if(panel.classList.contains('hidden')){
+    panel.classList.remove('hidden');
+    renderNotifList();
+    // Marquer toutes comme lues
+    getNotifs().forEach(n=>n.read=true);
+    updateNotifBadge();
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+
+function renderNotifList(){
+  const notifs=getNotifs();
+  const list=$('notif-list');
+  if(!notifs.length){
+    list.innerHTML='<div style="color:var(--muted);font-size:.88rem;text-align:center;padding:28px;font-style:italic">Aucune notification</div>';
+    return;
+  }
+  const typeColor={msg:'var(--accent)',task:'var(--green)',event:'var(--a2)',idea:'var(--gold)',action:'var(--muted)'};
+  list.innerHTML=notifs.map(n=>`
+    <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);transition:.15s"
+         onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+      <div style="width:8px;height:8px;border-radius:50%;background:${typeColor[n.type]||'var(--muted)'};flex-shrink:0;margin-top:6px"></div>
+      <div style="flex:1">
+        <div style="font-size:.88rem;font-weight:600;margin-bottom:3px">${n.msg}</div>
+        ${n.detail?`<div style="font-size:.8rem;color:var(--muted)">${n.detail}</div>`:''}
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">${ago(n.ts)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function clearNotifs(){
+  notifStore[authId]=[];
+  updateNotifBadge();
+  renderNotifList();
+}
+
+// Fermer le panneau notif en cliquant ailleurs
+document.addEventListener('click',e=>{
+  const panel=$('notif-panel');
+  const btn=$('notif-btn');
+  if(panel&&btn&&!panel.classList.contains('hidden')&&!panel.contains(e.target)&&!btn.contains(e.target)){
+    panel.classList.add('hidden');
+  }
+});
+
+function toggleTheme(){
+  const b=document.body;
+  b.setAttribute('data-theme',b.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+
+// ════════════════════════════════════════
+//  NAVIGATION VUES
+// ════════════════════════════════════════
+function showView(v){
+  ['planning','tasks','ideas','history'].forEach(n=>{
+    $('view-'+n).classList.toggle('hidden',n!==v);
+  });
+  q('.nav-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['planning','tasks','ideas','history'][i]===v);
+  });
+  if(v==='history') renderHistory();
+  if(v==='ideas')   renderIdeas();
+  if(v==='tasks')   renderBoard();
+}
+
+// ════════════════════════════════════════
+//  ÉQUIPE
+// ════════════════════════════════════════
+function renderTeam(){
+  $('team-list').innerHTML=activeGrp.members.map(uid=>{
+    const a=acct(uid); if(!a) return '';
+    const isMe=uid===authId;
+    return `<div class="tmember">
+      <div class="mav" style="background:${a.color}">${a.name[0]}</div>
+      <div style="flex:1">
+        <div class="mname">${a.name}
+          ${isMe?'<span style="font-size:.72rem;color:var(--accent);font-weight:600;margin-left:5px">(vous)</span>':''}
+        </div>
+        <div class="mrole">${a.role}</div>
+      </div>
+      <div class="sdot" title="En ligne"></div>
+      ${!isMe?`<button class="btn-icon" onclick="openMsg('${uid}')" title="Message">💬</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  MESSAGERIE
+// ════════════════════════════════════════
+function msgKey(a,b){ return [a,b].sort().join('__'); }
+
+function openMsg(targetId){
+  const ta=acct(targetId); if(!ta) return;
+  msgTarget=targetId;
+  const av=$('msg-hdr-av');
+  av.textContent=ta.name[0]; av.style.background=ta.color;
+  $('msg-hdr-name').textContent=ta.name;
+  show('msg-overlay');
+  $('msg-input').focus();
+  renderMsgBody();
+}
+
+function renderMsgBody(){
+  if(!msgTarget) return;
+  const key=msgKey(authId,msgTarget);
+  if(!activeGrp.messages[key]) activeGrp.messages[key]=[];
+  const msgs=activeGrp.messages[key];
+  const body=$('msg-body');
+  if(!msgs.length){
+    body.innerHTML='<div class="msg-empty">Aucun message. Dites bonjour ! 👋</div>';
+    return;
+  }
+  body.innerHTML=msgs.map(m=>{
+    const isMe=m.from===authId;
+    const a=acct(m.from);
+    return `<div class="bubble ${isMe?'me':'them'}">
+      ${!isMe?`<div class="bubble-name">${a?.name||m.from}</div>`:''}
+      ${m.text}
+    </div>`;
+  }).join('');
+  body.scrollTop=body.scrollHeight;
+}
+
+function sendMsg(){
+  const inp=$('msg-input');
+  const txt=inp.value.trim();
+  if(!txt||!msgTarget) return;
+  const key=msgKey(authId,msgTarget);
+  if(!activeGrp.messages[key]) activeGrp.messages[key]=[];
+  activeGrp.messages[key].push({from:authId,text:txt,ts:Date.now()});
+  inp.value='';
+  renderMsgBody();
+  addHistory(`a envoyé un message à ${acct(msgTarget)?.name}`,txt.length>40?txt.slice(0,40)+'…':txt,'msg','Message');
+  toast('Message envoyé !','g');
+}
+
+function closeMsg(){ hide('msg-overlay'); msgTarget=null; }
+function closeMsgOutside(e){ if(e.target===$('msg-overlay')) closeMsg(); }
+
+// ════════════════════════════════════════
+//  TO-DO
+// ════════════════════════════════════════
+function getTodos(){ return activeGrp.perTodos[authId]||(activeGrp.perTodos[authId]=[]); }
+
+function renderTodos(){
+  const todos=getTodos();
+  $('todo-list').innerHTML=todos.length
+    ? todos.map((t,i)=>`<div class="todo-item" id="td-${i}">
+        <input type="checkbox" onchange="checkTodo(${i},this)">
+        <span>${t}</span>
+      </div>`).join('')
+    : '<div class="empty">Aucune tâche rapide</div>';
+}
+
+function addTodo(){
+  const inp=$('todo-input');
+  if(!inp.value.trim()) return;
+  getTodos().unshift(inp.value.trim());
+  addHistory('a ajouté une tâche rapide',inp.value.trim(),'task','To-Do');
+  inp.value=''; renderTodos(); toast('Tâche ajoutée');
+}
+
+function checkTodo(i,cb){
+  $('td-'+i)?.classList.toggle('done',cb.checked);
+}
+
+// ════════════════════════════════════════
+//  HISTORIQUE
+// ════════════════════════════════════════
+function addHistory(action,detail,tag='action',label='Action'){
+  activeGrp.history.unshift({id:Date.now(),user:authId,action,detail,tag,label,ts:Date.now()});
+  if(activeGrp.history.length>100) activeGrp.history.pop();
+}
+
+function renderHistory(){
+  const g=activeGrp;
+  const sel=$('hist-filter');
+  const cur=sel.value;
+  sel.innerHTML=`<option value="all">Toute l'équipe</option>`
+    +g.members.map(uid=>`<option value="${uid}"${uid===cur?' selected':''}>${acct(uid)?.name||uid}</option>`).join('');
+
+  const items=cur==='all'?g.history:g.history.filter(h=>h.user===cur);
+  const tc={idea:'o',event:'',task:'g',msg:'',action:''};
+
+  $('h-feed').innerHTML=items.length
+    ? items.map(h=>{
+        const a=acct(h.user); if(!a) return '';
+        return `<div class="h-item">
+          <div class="h-av" style="background:${a.color}">${a.name[0]}</div>
+          <div class="h-body">
+            <div class="h-line">
+              <span class="h-name">${a.name}</span>
+              <span>${h.action}</span>
+              <span class="h-tag ${tc[h.tag]||''}">${h.label}</span>
+              <span class="h-time">${ago(h.ts)}</span>
+            </div>
+            <div class="h-detail">${h.detail}</div>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="empty">Aucune activité</div>';
+}
+
+// ════════════════════════════════════════
+//  IDÉES
+// ════════════════════════════════════════
+function getNotes(){ return activeGrp.perNotes[authId]||(activeGrp.perNotes[authId]=[]); }
+
+function switchIdea(t){
+  $('tab-g').classList.toggle('active',t==='groupe');
+  $('tab-p').classList.toggle('active',t==='perso');
+  $('pane-groupe').classList.toggle('hidden',t!=='groupe');
+  $('pane-perso').classList.toggle('hidden',t!=='perso');
+}
+
+function renderIdeas(){
+  const g=activeGrp;
+  $('list-groupe').innerHTML=g.ideas.length
+    ? g.ideas.map(idea=>{
+        const a=acct(idea.author);
+        return `<div class="idea-item">
+          <div class="idea-auth">
+            <span class="idea-dot" style="background:${a?.color||'#aaa'}"></span>
+            ${a?.name||idea.author}
+          </div>
+          <div class="idea-text">${idea.text}</div>
+          <div>
+            ${idea.comments.map(c=>`<div class="comment-item"><strong>${acct(c.author)?.name||c.author} :</strong> ${c.text}</div>`).join('')}
+            <div style="display:flex;gap:7px;margin-top:9px">
+              <input type="text" id="ci-${idea.id}" placeholder="Répondre..."
+                     style="margin:0;font-size:.88rem"
+                     onkeydown="if(event.key==='Enter')addComment(${idea.id})">
+              <button class="btn btn-primary btn-sm" onclick="addComment(${idea.id})">OK</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="empty">Aucune idée partagée</div>';
+
+  $('list-perso').innerHTML=getNotes().length
+    ? getNotes().map(n=>`<div class="idea-item" style="border-left:3px solid var(--muted)">${n}</div>`).join('')
+    : '<div class="empty">Aucune note privée</div>';
+}
+
+function addIdea(type){
+  const inp=$('inp-'+type);
+  if(!inp.value.trim()) return;
+  if(type==='groupe'){
+    activeGrp.ideas.unshift({id:Date.now(),author:authId,text:inp.value.trim(),comments:[],createdTs:Date.now()});
+    addHistory('a partagé une idée',inp.value.trim(),'idea','Idée');
+    toast('Idée partagée !','o');
+  } else {
+    getNotes().unshift(inp.value.trim());
+    toast('Note enregistrée');
+  }
+  inp.value=''; renderIdeas();
+}
+
+function addComment(ideaId){
+  const inp=document.getElementById('ci-'+ideaId);
+  if(!inp?.value.trim()) return;
+  const idea=activeGrp.ideas.find(i=>i.id===ideaId);
+  if(idea){
+    idea.comments.push({author:authId,text:inp.value.trim()});
+    addHistory('a commenté une idée',inp.value.trim(),'idea','Idée');
+    renderIdeas(); toast('Commentaire ajouté');
+  }
+}
+
+// ════════════════════════════════════════
+//  TASKBOARD
+// ════════════════════════════════════════
+function renderBoard(){
+  $('taskboard').innerHTML=COLS.map(col=>{
+    const tasks=activeGrp.tasks.filter(t=>
+      t.col===col.id&&(t.vis==='shared'||t.user===authId)
+    );
+    return `<div class="tb-col" id="col-${col.id}"
+        ondragover="event.preventDefault()" ondrop="dropTask(event,'${col.id}')">
+      <div class="tb-col-h">${col.label}
+        <span style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1px 9px;font-size:.72rem">${tasks.length}</span>
+      </div>
+      ${tasks.map(t=>{
+        const a=acct(t.user);
+        return `<div class="tc" draggable="true" style="--tc:${a?.color||'#555'}"
+            ondragstart="event.dataTransfer.setData('tid','${t.id}')">
+          ${t.vis==='private'?'🔒 ':''}${t.title}
+          <div class="tc-auth">${a?.name||t.user}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function dropTask(e,colId){
+  e.preventDefault();
+  const tid=parseInt(e.dataTransfer.getData('tid'));
+  const task=activeGrp.tasks.find(t=>t.id===tid);
+  if(!task) return;
+  if(task.user!==authId){ toast('Vous ne pouvez déplacer que vos tâches','r'); return; }
+  task.col=colId;
+  addHistory(`a déplacé une tâche → "${COLS.find(c=>c.id===colId)?.label}"`,task.title,'task','Tâche');
+  renderBoard(); toast('Déplacé →'+COLS.find(c=>c.id===colId)?.label,'g');
+}
+
+function openTaskModal(){
+  $('ftask-title').value='';
+  $('ftask-col').innerHTML=COLS.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
+  show('modal-task');
+}
+
+function saveTask(){
+  const title=$('ftask-title').value.trim();
+  if(!title){ toast('Veuillez saisir un titre de créneau','r'); return; }
+  activeGrp.tasks.push({id:Date.now(),title,user:authId,col:$('ftask-col').value,vis:$('ftask-vis').value,createdTs:Date.now()});
+  addHistory('a ajouté une tâche',title,'task','Tâche');
+  closeModals(); renderBoard(); toast('Tâche ajoutée !','g');
+}
+
+// ════════════════════════════════════════
+//  PLANNING
+// ════════════════════════════════════════
+function initCalendar(){
+  let html='<div class="cal-hdr"></div>';
+  DAYS.forEach(d=>html+=`<div class="cal-hdr">${d}</div>`);
+  for(let h=8;h<=18;h++){
+    html+=`<div class="cal-time">${h}h</div>`;
+    for(let d=1;d<=7;d++)
+      html+=`<div class="cal-cell" data-d="${d}" data-h="${h}"
+        ondragover="event.preventDefault()" ondrop="dropEv(event)"
+        onclick="openEvModal()"></div>`;
+  }
+  $('cal-grid').innerHTML=html;
+  renderEvents();
+}
+
+function renderEvents(){
+  q('.ev-block').forEach(e=>e.remove());
+  activeGrp.events.forEach(ev=>{
+    if(planView==='me'&&ev.user!==authId) return;
+    const cell=document.querySelector(`.cal-cell[data-d="${ev.day}"][data-h="${ev.hour}"]`);
+    if(!cell) return;
+    const a=acct(ev.user);
+    const isOwn=ev.user===authId;
+    const el=document.createElement('div');
+    el.className='ev-block';
+    el.draggable=isOwn;
+    el.id='ev-'+ev.id;
+    el.style.background=ev.indispo
+      ?'repeating-linear-gradient(45deg,#333,#333 8px,#444 8px,#444 16px)'
+      :(a?.color||'#555');
+    el.style.height=(ev.dur*62)+'px';
+    el.style.cursor=isOwn?'grab':'default';
+    el.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:3px">
+        <strong style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ev.title}</strong>
+        ${isOwn?`<button onclick="event.stopPropagation();quickDeleteEv(${ev.id})" style="background:rgba(0,0,0,.35);border:none;color:#fff;border-radius:3px;padding:1px 4px;font-size:.65rem;cursor:pointer;flex-shrink:0;line-height:1.4" title="Supprimer">✕</button>`:''}
+      </div>
+      ${planView==='all'&&a?`<div style="font-size:.66rem;opacity:.8;margin-top:2px">${a.name}</div>`:''}
+    `;
+    el.onclick=e=>{e.stopPropagation(); if(isOwn) openEvModal(ev.id);};
+    if(isOwn) el.ondragstart=e=>e.dataTransfer.setData('evid',ev.id);
+    cell.appendChild(el);
+  });
+}
+
+function quickDeleteEv(id){
+  if(!confirm('Supprimer ce créneau ?')) return;
+  const ev=activeGrp.events.find(e=>e.id===id);
+  if(!ev||ev.user!==authId){ toast('Action refusée','r'); return; }
+  addHistory('a supprimé un créneau',ev.title,'event','Planning');
+  activeGrp.events=activeGrp.events.filter(e=>e.id!==id);
+  renderEvents(); toast('Créneau supprimé');
+}
+
+function setPView(v){
+  planView=v;
+  $('bv-all').classList.toggle('active',v==='all');
+  $('bv-me').classList.toggle('active',v==='me');
+  renderEvents();
+}
+
+function dropEv(e){
+  e.preventDefault();
+  const evId=parseInt(e.dataTransfer.getData('evid'));
+  if(isNaN(evId)) return;
+  const ev=activeGrp.events.find(x=>x.id===evId);
+  const cell=e.target.closest('.cal-cell');
+  if(!cell||!ev) return;
+  if(ev.user!==authId){ toast('Vous ne pouvez déplacer que vos créneaux','r'); return; }
+  ev.day=parseInt(cell.dataset.d); ev.hour=parseInt(cell.dataset.h);
+  addHistory('a déplacé un créneau',ev.title,'event','Planning');
+  renderEvents(); toast('Créneau déplacé !','g');
+}
+
+function openEvModal(id=null){
+  editEvId=id;
+  if(id){
+    const ev=activeGrp.events.find(e=>e.id===id);
+    if(!ev) return;
+    // Si c'est pas le mien, juste afficher en lecture seule
+    if(ev.user!==authId){ toast('Vous ne pouvez modifier que vos créneaux','r'); return; }
+    $('mev-title').textContent='Modifier le créneau du planning';
+    $('fev-title').value=ev.title; $('fev-day').value=ev.day;
+    $('fev-hour').value=ev.hour; $('fev-dur').value=ev.dur;
+    $('btn-del-ev').classList.remove('hidden');
+  } else {
+    $('mev-title').textContent='Ajouter un créneau au planning';
+    $('fev-title').value='';
+    $('fev-day').value=3; $('fev-hour').value=10; $('fev-dur').value=1;
+    $('btn-del-ev').classList.add('hidden');
+  }
+  show('modal-ev');
+}
+
+function saveEvent(){
+  const title=$('fev-title').value.trim();
+  if(!title) return;
+  if(editEvId){
+    const ev=activeGrp.events.find(e=>e.id===editEvId);
+    ev.title=title; ev.day=+$('fev-day').value;
+    ev.hour=+$('fev-hour').value; ev.dur=+$('fev-dur').value;
+    addHistory('a modifié un créneau',title,'event','Planning');
+    toast('Créneau mis à jour !','g');
+  } else {
+    const nev={id:Date.now(),title,user:authId,
+      day:+$('fev-day').value,hour:+$('fev-hour').value,dur:+$('fev-dur').value,
+      createdTs:Date.now()};
+    activeGrp.events.push(nev);
+    checkConflicts(nev);
+    addHistory('a créé un créneau',`${title} – ${DAYS[nev.day-1]} ${nev.hour}h`,'event','Planning');
+    toast('Créneau ajouté !','g');
+  }
+  closeModals(); renderEvents();
+}
+
+function checkConflicts(nev){
+  const c=activeGrp.events.filter(ev=>
+    ev.id!==nev.id&&ev.user===nev.user&&ev.day===nev.day&&
+    Math.abs(ev.hour-nev.hour)<Math.max(ev.dur,nev.dur)
+  );
+  if(c.length){
+    $('coach-text').textContent=`⚠️ Conflit détecté : "${nev.title}" chevauche "${c[0].title}" le ${['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'][nev.day-1]}. Suggestion : tester un créneau vers ${nev.hour+2}h.`; $('coach-text').classList.add('alert');
+    toast('⚠️ Conflit d\'agenda détecté !','r');
+  }
+}
+
+function deleteEvent(){
+  if(!confirm('Supprimer ce créneau ?')) return;
+  const ev=activeGrp.events.find(e=>e.id===editEvId);
+  addHistory('a supprimé un créneau',ev?.title||'','event','Planning');
+  activeGrp.events=activeGrp.events.filter(e=>e.id!==editEvId);
+  closeModals(); renderEvents(); toast('Créneau supprimé');
+}
+
+// ════════════════════════════════════════
+//  CRÉER GROUPE
+// ════════════════════════════════════════
+let _icon='🎬',_color='#6366f1';
+
+function openGroupModal(){
+  _icon='🎬'; _color='#6366f1';
+  $('fg-name').value=''; $('fg-desc').value='';
+  hide('invite-result');
+  $('fg-btn').disabled=false;
+  $('fg-btn').textContent='Créer le groupe';
+  q('.cswatch').forEach((s,i)=>s.classList.toggle('sel',i===0));
+  q('#icon-picker span').forEach(s=>s.classList.remove('sel'));
+  show('modal-group');
+}
+
+function pickIcon(el){q('#icon-picker span').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');_icon=el.dataset.i;}
+function pickColor(el){q('.cswatch').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');_color=el.dataset.c;}
+
+function createGroup(){
+  const name=$('fg-name').value.trim();
+  if(!name){ toast('Veuillez entrer un nom de groupe','r'); return; }
+  const desc=$('fg-desc').value.trim();
+  const code=(name.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8))||('GRP'+Date.now().toString().slice(-4));
+  const id='grp-'+Date.now();
+
+  groups.push({
+    id,name,desc:desc||'Espace collaboratif',icon:_icon,color:_color,
+    inviteCode:code,members:[authId],
+    events:[],tasks:[],ideas:[],messages:{},
+    history:[{id:Date.now(),user:authId,action:'a créé le groupe',detail:name,tag:'action',label:'Groupe',ts:Date.now()}],
+    perNotes:{[authId]:[]}, perTodos:{[authId]:[]}
+  });
+
+  if(!accounts[authId].groupIds.includes(id)) accounts[authId].groupIds.push(id);
+
+  $('invite-code').textContent=code;
+  show('invite-result');
+  $('fg-btn').disabled=true;
+  $('fg-btn').textContent='Groupe créé ✓';
+  toast(`Groupe "${name}" créé !`,'g');
+
+  if($('groups-grid')) renderGroupGrid();
+}
+
+function copyCode(){
+  const code=$('invite-code').textContent;
+  navigator.clipboard?.writeText(code).then(()=>toast('Code copié !','g')).catch(()=>{});
+}
+
+// ════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════
+function closeModals(){
+  ['modal-ev','modal-task','modal-group'].forEach(id=>hide(id));
+}
+
+q('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{
+  if(e.target===o) closeModals();
+}));
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+screen('auth-screen');
+</script>
+</body>
+</html>
